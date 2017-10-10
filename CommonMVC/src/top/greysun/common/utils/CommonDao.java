@@ -1,4 +1,4 @@
-package top.greysun.common.util;
+package top.greysun.common.utils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;

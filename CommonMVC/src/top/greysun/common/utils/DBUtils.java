@@ -1,4 +1,4 @@
-package top.greysun.common.util;
+package top.greysun.common.utils;
 
 public class DBUtils extends OracleUtils {
 
