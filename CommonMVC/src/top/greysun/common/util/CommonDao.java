@@ -1,4 +1,4 @@
-package top.greysun.common.dao.impl;
+package top.greysun.common.util;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -15,21 +15,18 @@ import java.util.List;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
 
-import top.greysun.common.dao.CommonDao;
-import top.greysun.common.util.DBUtils;
-
 /**
- * 操作实现类
+ * 增删改查
  * @author http://www.greysun.top
  * @version 1.0
  * @param <E>
  */
-public abstract class CommonDaoImpl<E> implements CommonDao<E> {
+public abstract class CommonDao<E> implements QueryInterface<E> {
 	private Class <E> cls;
 	private String tbName;
 	private String primaryKey;
 
-	public CommonDaoImpl(String tbName){
+	public CommonDao(String tbName){
 		this.tbName = tbName;
 		iniDate();
 	}
@@ -37,7 +34,7 @@ public abstract class CommonDaoImpl<E> implements CommonDao<E> {
 	/**
 	 * 实体类名必须赫尔表名一直
 	 */
-	public CommonDaoImpl(){
+	public CommonDao(){
 		iniDate();
 	}
 
