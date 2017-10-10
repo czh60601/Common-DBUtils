@@ -134,7 +134,7 @@ public abstract class CommonDaoImpl<E> implements CommonDao<E> {
 		for(String key : remove){
 
 			//添加主键字段
-			if(key.equalsIgnoreCase(primaryKey) && DBUtils.NAME.equals("oracle")){
+			if(key.equalsIgnoreCase(primaryKey) && DBUtils.NAME.equalsIgnoreCase("oracle")){
 				//获取序列值实现自增长
 				sql1 += key+",";
 				sql2 += "seq_"+tbName+"_id.nextval,";
@@ -166,8 +166,31 @@ public abstract class CommonDaoImpl<E> implements CommonDao<E> {
 
 	@Override
 	public int update(E e) throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
+		Connection conn = DBUtils.getConnection();
+		QueryRunner qr = new QueryRunner();
+		//拼接查询语句
+		String sql = "update "+tbName+" set ";
+
+		HashMap<String, Object> param = toParamList(e);
+		Object primaryKeyValue = param.remove(primaryKey);
+
+		int n=0;
+		for(String key:param.keySet()){
+			n++;
+			if(n!=param.size()){
+				sql += key+"=?,";
+			}else{
+				sql += key+"=? where "+primaryKey+"=?";
+			}
+		}
+
+		int row;
+		//修改
+		row = qr.update(conn,sql, param.values().toArray(),primaryKeyValue);
+
+		conn.close();
+
+		return row;
 	}
 
 	@Override
