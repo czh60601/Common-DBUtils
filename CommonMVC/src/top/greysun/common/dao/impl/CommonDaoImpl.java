@@ -108,7 +108,7 @@ public abstract class CommonDaoImpl<E> implements CommonDao<E> {
 	public int insert(E e) throws Exception {
 		Connection conn = DBUtils.getConnection();
 		QueryRunner qr = new QueryRunner();
-		//∆¥Ω”≤È—Ø”Ôæ‰
+		//∆¥Ω”≤Â»Î”Ôæ‰
 		String sql1 = "insert into "+tbName+" (";
 		String sql2 = "values(";
 
@@ -168,7 +168,6 @@ public abstract class CommonDaoImpl<E> implements CommonDao<E> {
 	public int update(E e) throws Exception {
 		Connection conn = DBUtils.getConnection();
 		QueryRunner qr = new QueryRunner();
-		//∆¥Ω”≤È—Ø”Ôæ‰
 		String sql = "update "+tbName+" set ";
 
 		HashMap<String, Object> param = toParamList(e);
@@ -195,8 +194,16 @@ public abstract class CommonDaoImpl<E> implements CommonDao<E> {
 
 	@Override
 	public int delete(int... id) throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
+		int row = 0;
+		Connection conn = DBUtils.getConnection();
+		QueryRunner qr = new QueryRunner();
+		String sql = "delete from "+tbName+" where "+primaryKey+"=?";
+		for(int pid:id){
+			row += qr.update(conn,sql,pid);
+		}
+		conn.close();
+		
+		return row;
 	}
 
 	@Override
