@@ -7,10 +7,6 @@ import java.sql.ResultSet;
 
 public class DBUtils extends OracleUtils {
 
-	public static boolean isOrcl() {
-		return true;
-	}
-
 	public static int getCount(String tbName){
 		String sql = "SELECT COUNT(*) FROM "+tbName;
 		int rowCount = 0;  

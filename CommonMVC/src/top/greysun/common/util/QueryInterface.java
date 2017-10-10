@@ -49,4 +49,11 @@ public interface QueryInterface<E> {
 	 * @throws Exception
 	 */
 	public int delete(int...id) throws Exception;
+	
+	/**
+	 * 获取表数据条数
+	 * @return int
+	 * @throws Exception
+	 */
+	public int getCount() throws Exception;
 }

@@ -9,7 +9,7 @@ public class MySqlUtils{
 	final private static String diver = "com.mysql.jdbc.Driver";
 	final private static String user = "root";
 	final private static String password = "123456";
-
+	final public static String NAME = "mysql";
 	//静态代码块：仅加载这个类时执行一次
 	static{
 		//注册

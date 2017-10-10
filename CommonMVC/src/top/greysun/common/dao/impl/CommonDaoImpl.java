@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -133,7 +134,7 @@ public abstract class CommonDaoImpl<E> implements CommonDao<E> {
 		for(String key : remove){
 
 			//添加主键字段
-			if(key.equalsIgnoreCase(primaryKey) && DBUtils.isOrcl()){
+			if(key.equalsIgnoreCase(primaryKey) && DBUtils.NAME.equals("oracle")){
 				//获取序列值实现自增长
 				sql1 += key+",";
 				sql2 += "seq_"+tbName+"_id.nextval,";
@@ -173,6 +174,24 @@ public abstract class CommonDaoImpl<E> implements CommonDao<E> {
 	public int delete(int... id) throws Exception {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public int getCount() throws Exception{
+		String sql = "SELECT COUNT(*) FROM "+tbName;
+		int rowCount = 0;
+
+		Connection conn = DBUtils.getConnection();  
+		PreparedStatement psmt = conn.prepareStatement(sql);  
+		ResultSet res = psmt.executeQuery();  
+		while(res.next()){  
+			rowCount = res.getInt(1);  
+		}  
+		res.close();
+		psmt.close();
+		conn.close();
+
+		return rowCount;
 	}
 
 	private HashMap<String, Object> toParamList(E entity){
@@ -222,4 +241,5 @@ public abstract class CommonDaoImpl<E> implements CommonDao<E> {
 	public Class<E> getCls(){
 		return cls;
 	}
+
 }
