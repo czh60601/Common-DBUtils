@@ -5,11 +5,18 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class MySqlUtils{
-	final private static String url = "jdbc:mysql://localhost:3306/pets";
+	final private static String url = "jdbc:mysql://localhost:3306/";
 	final private static String diver = "com.mysql.jdbc.Driver";
-	final private static String user = "root";
-	final private static String password = "123456";
+
+	/**
+	 * 数据库软件名
+	 */
 	final public static String NAME = "mysql";
+
+	protected static String dbname = "pet";
+	protected static String user = "root";
+	protected static String password = "123456";
+
 	//静态代码块：仅加载这个类时执行一次
 	static{
 		//注册
@@ -22,14 +29,14 @@ public class MySqlUtils{
 
 	public static Connection getConnection() {
 		Connection conn = null;
-		
+
 		//连接
 		try {
-			conn = DriverManager.getConnection(url, user, password);
+			conn = DriverManager.getConnection(url+dbname, user, password);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return conn;
 	}
 }
