@@ -43,15 +43,17 @@ public abstract class CommonDao<E> implements QueryInterface<E> {
 		cls = (Class<E>)((ParameterizedType)this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 		tbName = cls.getSimpleName().toUpperCase();
 
-		//获取主键名
-		Connection conn = DBUtils.getConnection();
+
 		try {
+			//获取主键名
+			Connection conn = JDBCUtils.getConnection();
 			DatabaseMetaData md = conn.getMetaData();
 			ResultSet rs = md.getPrimaryKeys(conn.getCatalog(), null,tbName);
 
 			while(rs.next()){
 				primaryKey = rs.getString("COLUMN_NAME").toUpperCase();
 			}
+			conn.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -59,8 +61,7 @@ public abstract class CommonDao<E> implements QueryInterface<E> {
 
 	@Override
 	public List<E> query() throws Exception {
-		Connection conn = DBUtils.getConnection();
-		QueryRunner qr = new QueryRunner();
+		QueryRunner qr = JDBCUtils.getQueryRunner();
 		//拼接查询语句
 		String sql = "select ";
 		Object[] keys = toParamList();
@@ -73,16 +74,14 @@ public abstract class CommonDao<E> implements QueryInterface<E> {
 			}
 		}
 
-		List<E> list = qr.query(conn,sql,new BeanListHandler<E>(cls));
-		conn.close();
+		List<E> list = qr.query(sql,new BeanListHandler<E>(cls));
 
 		return list;
 	}
 
 	@Override
 	public List<E> query(String where,Object...param) throws Exception{
-		Connection conn = DBUtils.getConnection();
-		QueryRunner qr = new QueryRunner();
+		QueryRunner qr = JDBCUtils.getQueryRunner();
 		//构造查询语句
 		String sql = "select ";
 		Object[] keys = toParamList();
@@ -95,16 +94,14 @@ public abstract class CommonDao<E> implements QueryInterface<E> {
 			}
 		}
 
-		List<E> list = qr.query(conn,sql,new BeanListHandler<E>(cls),param);
-		conn.close();
+		List<E> list = qr.query(sql,new BeanListHandler<E>(cls),param);
 
 		return list;
 	}
 
 	@Override
 	public int insert(E e) throws Exception {
-		Connection conn = DBUtils.getConnection();
-		QueryRunner qr = new QueryRunner();
+		QueryRunner qr = JDBCUtils.getQueryRunner();
 		//拼接插入语句
 		String sql1 = "insert into "+tbName+" (";
 		String sql2 = "values(";
@@ -130,7 +127,7 @@ public abstract class CommonDao<E> implements QueryInterface<E> {
 
 		for(String key : remove){
 			//如果主键字段为空,且数据库软件为oracle,添加自增长
-			if(key.equalsIgnoreCase(primaryKey) && DBUtils.NAME.equalsIgnoreCase("oracle")){
+			if(key.equalsIgnoreCase(primaryKey) && JDBCUtils.NAME.equalsIgnoreCase("oracle")){
 				//获取序列值实现自增长
 				sql1 += key+",";
 				sql2 += "seq_"+tbName+"_id.nextval,";
@@ -153,23 +150,20 @@ public abstract class CommonDao<E> implements QueryInterface<E> {
 
 		int row;
 		//插入
-		row = qr.update(conn,sql1+sql2, param.values().toArray());
-
-		conn.close();
+		row = qr.update(sql1+sql2, param.values().toArray());
 
 		return row;
 	}
 
 	@Override
 	public int update(E e) throws Exception {
-		Connection conn = DBUtils.getConnection();
-		QueryRunner qr = new QueryRunner();
+		QueryRunner qr = JDBCUtils.getQueryRunner();
 		String sql = "update "+tbName+" set ";
 
 		HashMap<String, Object> param = toParamList(e);
 		ArrayList<Object> keyValue = new ArrayList<Object>();
 		Object primaryKeyValue = new Object();
-		
+
 		//提取所有值,并单独提取主键值
 		for(String key:param.keySet()){
 			if(key.equalsIgnoreCase(primaryKey)){
@@ -178,7 +172,7 @@ public abstract class CommonDao<E> implements QueryInterface<E> {
 				keyValue.add(param.get(key));
 			}
 		}
-		
+
 		//移除主键
 		param.remove(primaryKey.toUpperCase());
 		//将主键值放在最后
@@ -196,9 +190,7 @@ public abstract class CommonDao<E> implements QueryInterface<E> {
 
 		int row;
 		//修改
-		row = qr.update(conn,sql,keyValue.toArray());
-
-		conn.close();
+		row = qr.update(sql,keyValue.toArray());
 
 		return row;
 	}
@@ -206,14 +198,12 @@ public abstract class CommonDao<E> implements QueryInterface<E> {
 	@Override
 	public int delete(int... id) throws Exception {
 		int row = 0;
-		Connection conn = DBUtils.getConnection();
-		QueryRunner qr = new QueryRunner();
+		QueryRunner qr = JDBCUtils.getQueryRunner();
 		String sql = "delete from "+tbName+" where "+primaryKey+"=?";
 		for(int pid:id){
-			row += qr.update(conn,sql,pid);
+			row += qr.update(sql,pid);
 		}
-		conn.close();
-		
+
 		return row;
 	}
 
@@ -222,7 +212,7 @@ public abstract class CommonDao<E> implements QueryInterface<E> {
 		String sql = "SELECT COUNT(*) FROM "+tbName;
 		int rowCount = 0;
 
-		Connection conn = DBUtils.getConnection();  
+		Connection conn = JDBCUtils.getConnection();  
 		PreparedStatement psmt = conn.prepareStatement(sql);  
 		ResultSet res = psmt.executeQuery();  
 		while(res.next()){  
