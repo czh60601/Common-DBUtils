@@ -130,7 +130,7 @@ public abstract class CommonDao<E> implements QueryInterface<E> {
 			if(key.equalsIgnoreCase(primaryKey) && JDBCUtils.NAME.equalsIgnoreCase("oracle")){
 				//获取序列值实现自增长
 				sql1 += key+",";
-				sql2 += "seq_"+tbName+"_id.nextval,";
+				sql2 += "seq_"+tbName+".nextval,";
 			}
 			param.remove(key);
 		}
