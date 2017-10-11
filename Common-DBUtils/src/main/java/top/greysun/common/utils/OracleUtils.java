@@ -13,9 +13,9 @@ public class OracleUtils {
 	 */
 	final public static String NAME = "oracle";
 
-	protected static String dbname = "orcl";
-	protected static String user = "SCOTT";
-	protected static String password = "tiger";
+	private static String dbname = "orcl";
+	private static String user = "SCOTT";
+	private static String password = "tiger";
 
 	//静态代码块：仅加载这个类时执行一次
 	static{
@@ -25,6 +25,12 @@ public class OracleUtils {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public OracleUtils(String dbname,String user,String password){
+		OracleUtils.dbname = dbname;
+		OracleUtils.user = user;
+		OracleUtils.password = password;
 	}
 
 	public static Connection getConnection() {

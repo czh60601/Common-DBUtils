@@ -50,7 +50,7 @@ public abstract class CommonDao<E> implements QueryInterface<E> {
 			ResultSet rs = md.getPrimaryKeys(conn.getCatalog(), null,tbName);
 
 			while(rs.next()){
-				primaryKey = rs.getString("COLUMN_NAME");
+				primaryKey = rs.getString("COLUMN_NAME").toUpperCase();
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -129,8 +129,7 @@ public abstract class CommonDao<E> implements QueryInterface<E> {
 		}
 
 		for(String key : remove){
-
-			//添加主键字段
+			//如果主键字段为空,且数据库软件为oracle,添加自增长
 			if(key.equalsIgnoreCase(primaryKey) && DBUtils.NAME.equalsIgnoreCase("oracle")){
 				//获取序列值实现自增长
 				sql1 += key+",";
@@ -168,7 +167,22 @@ public abstract class CommonDao<E> implements QueryInterface<E> {
 		String sql = "update "+tbName+" set ";
 
 		HashMap<String, Object> param = toParamList(e);
-		Object primaryKeyValue = param.remove(primaryKey);
+		ArrayList<Object> keyValue = new ArrayList<Object>();
+		Object primaryKeyValue = new Object();
+		
+		//提取所有值,并单独提取主键值
+		for(String key:param.keySet()){
+			if(key.equalsIgnoreCase(primaryKey)){
+				primaryKeyValue = param.get(key);
+			}else{
+				keyValue.add(param.get(key));
+			}
+		}
+		
+		//移除主键
+		param.remove(primaryKey.toUpperCase());
+		//将主键值放在最后
+		keyValue.add(primaryKeyValue);
 
 		int n=0;
 		for(String key:param.keySet()){
@@ -182,7 +196,7 @@ public abstract class CommonDao<E> implements QueryInterface<E> {
 
 		int row;
 		//修改
-		row = qr.update(conn,sql, param.values().toArray(),primaryKeyValue);
+		row = qr.update(conn,sql,keyValue.toArray());
 
 		conn.close();
 

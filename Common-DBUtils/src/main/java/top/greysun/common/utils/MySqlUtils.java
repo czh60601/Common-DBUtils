@@ -27,6 +27,12 @@ public class MySqlUtils{
 		}
 	}
 
+	public MySqlUtils(String dbname,String user,String password){
+		MySqlUtils.dbname = dbname;
+		MySqlUtils.user = user;
+		MySqlUtils.password = password;
+	}
+
 	public static Connection getConnection() {
 		Connection conn = null;
 
